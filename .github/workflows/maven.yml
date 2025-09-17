@@ -10,6 +10,15 @@ jobs:
   sonar:
     runs-on: ubuntu-latest
 
+    services:
+      sonarqube:
+        image: sonarqube:lts-community
+        ports:
+          - 9000:9000
+        options: >-
+          --health-cmd="curl --fail http://localhost:9000/api/system/health || exit 1"
+          --health-interval=10s --health-timeout=5s --health-retries=30
+
     steps:
       - uses: actions/checkout@v3
 
@@ -20,8 +29,16 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
-      - name: SonarQube Scan
-        run: mvn -B verify sonar:sonar
+      - name: Wait for SonarQube to be ready
+        run: |
+          for i in {1..60}; do
+            if curl -fsS http://localhost:9000/api/system/status | grep -q '"status":"UP"'; then
+              echo "SonarQube is up"; break
+            fi
+            echo "Waiting for SonarQube..."; sleep 5
+          done
+
+      - name: Sonar Scan
+        run: mvn -B verify sonar:sonar -Dsonar.login=$SONAR_TOKEN -Dsonar.host.url=http://localhost:9000
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
