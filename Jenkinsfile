@@ -9,7 +9,7 @@ pipeline {
     stages {
 		stage('Checkout') {
 			steps {
-				git branch: 'main', url: 'https://github.com/votre-utilisateur/bibliotheque-app.git'
+				git branch: 'main', url: 'https://github.com/N377Y/bibliotheque-app.git'
             }
         }
 
@@ -29,5 +29,14 @@ pipeline {
                 }
             }
         }
+
+        stage('SonarQube Analysis') {
+			steps {
+				withSonarQubeEnv('SonarQube') {
+					sh 'mvn sonar:sonar'
+        		}
+    		}
+		}
+
     }
 }
