@@ -1,4 +1,4 @@
-name: Java CI with Maven
+name: SonarQube Scan
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
+  sonar:
     runs-on: ubuntu-latest
 
     steps:
@@ -20,14 +20,8 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
-      - name: Build with Maven
-        run: mvn compile
-
-      - name: Run tests with Maven
-        run: mvn test
-
       - name: SonarQube Scan
-          run: mvn -B verify sonar:sonar
-          env:
-            SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-            SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        run: mvn -B verify sonar:sonar
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
