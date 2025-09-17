@@ -7,11 +7,6 @@ pipeline {
     }
 
     stages {
-		stage('Checkout') {
-			steps {
-				git branch: 'main', url: 'https://github.com/N377Y/bibliotheque-app.git'
-            }
-        }
 
         stage('Build') {
 			steps {
